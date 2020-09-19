@@ -8,7 +8,8 @@
 
 import Foundation
 
-struct SOAPTestModel {
+struct SOAPTestModel: Identifiable {
+    let id = UUID()
     let ak: String
     let departureDate: String
     let departureTime: String
@@ -19,4 +20,10 @@ struct SOAPTestModel {
     let durationTime: String
     let departureAirportCode: String
     let arrivalAirportCode: String
+}
+
+extension SOAPTestModel: Equatable {
+    static func == (lhs: SOAPTestModel, rhs: SOAPTestModel) -> Bool {
+        lhs.id == rhs.id
+    }
 }

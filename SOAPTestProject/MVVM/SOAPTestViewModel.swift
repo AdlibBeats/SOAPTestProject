@@ -35,47 +35,50 @@ extension SOAPTestViewModel: SOAPTestViewModelProtocol {
         let service = testService
         let loadingRelay = BehaviorRelay<Bool>(value: true)
         
-        return Output(loading: loadingRelay.asDriver(), source: testService.fetchToken()
-            .do(onNext: { [weak self] in self?.testService.token = $0 })
-            .flatMapLatest { _ in
-                service.fetchOptimalFaresOffers(
-                    with: DateFormatter().with {
-                        $0.dateFormat = "dd.MM.yyyy"
-                    }.date(from: "25.09.2020")
-                )
-            }
-            .map {
-                $0.filter { $0.ak == "S7" }.flatMap { offer in
-                    (offer.directions ?? []).flatMap { $0.flights ?? [] }.flatMap { $0.segments ?? [] }.map {
-                        SOAPTestModel(
-                            ak: $0.ak ?? "",
-                            departureDate: { (date: Date?) -> String in
-                                guard let date = date else { return "" }
-                                return DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.string(from: date)
-                            }($0.departureDate),
-                            departureTime: { (date: Date?) -> String in
-                                guard let date = date else { return "" }
-                                return DateFormatter().with { $0.dateFormat = "HH:mm" }.string(from: date)
-                            }($0.departureTime),
-                            arrivalDate: { (date: Date?) -> String in
-                                guard let date = date else { return "" }
-                                return DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.string(from: date)
-                            }($0.arrivalDate),
-                            arrivalTime: { (date: Date?) -> String in
-                                guard let date = date else { return "" }
-                                return DateFormatter().with { $0.dateFormat = "HH:mm" }.string(from: date)
-                            }($0.arrivalTime),
-                            flightNumber: $0.flightNumber ?? "",
-                            totalPrice: offer.totalPrice ?? "",
-                            durationTime: $0.durationTime,
-                            departureAirportCode: $0.departureAirportCode ?? "",
-                            arrivalAirportCode: $0.arrivalAirportCode ?? ""
-                        )
+        return Output(
+            loading: loadingRelay.asDriver().distinctUntilChanged(),
+            source: testService.fetchToken()
+                .do(onNext: { [weak self] in self?.testService.token = $0 })
+                .flatMapLatest { _ in
+                    service.fetchOptimalFaresOffers(
+                        with: DateFormatter().with {
+                            $0.dateFormat = "dd.MM.yyyy"
+                        }.date(from: "25.09.2020")
+                    )
+                }
+                .map {
+                    $0.filter { $0.ak == "S7" }.flatMap { offer in
+                        (offer.directions ?? []).flatMap { $0.flights ?? [] }.flatMap { $0.segments ?? [] }.map {
+                            SOAPTestModel(
+                                ak: $0.ak ?? "",
+                                departureDate: { (date: Date?) -> String in
+                                    guard let date = date else { return "" }
+                                    return DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.string(from: date)
+                                }($0.departureDate),
+                                departureTime: { (date: Date?) -> String in
+                                    guard let date = date else { return "" }
+                                    return DateFormatter().with { $0.dateFormat = "HH:mm" }.string(from: date)
+                                }($0.departureTime),
+                                arrivalDate: { (date: Date?) -> String in
+                                    guard let date = date else { return "" }
+                                    return DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.string(from: date)
+                                }($0.arrivalDate),
+                                arrivalTime: { (date: Date?) -> String in
+                                    guard let date = date else { return "" }
+                                    return DateFormatter().with { $0.dateFormat = "HH:mm" }.string(from: date)
+                                }($0.arrivalTime),
+                                flightNumber: $0.flightNumber ?? "",
+                                totalPrice: offer.totalPrice ?? "",
+                                durationTime: $0.durationTime,
+                                departureAirportCode: $0.departureAirportCode ?? "",
+                                arrivalAirportCode: $0.arrivalAirportCode ?? ""
+                            )
+                        }
                     }
                 }
-            }
-            .asDriver(onErrorJustReturn: [])
-            .do(onNext: { _ in loadingRelay.accept(false) })
+                .asDriver(onErrorJustReturn: [])
+                .distinctUntilChanged()
+                .do(onNext: { loadingRelay.accept($0.isEmpty) })
         )
     }
 }
