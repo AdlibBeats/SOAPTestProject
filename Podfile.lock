@@ -10,9 +10,6 @@ PODS:
   - Moya/RxSwift (14.0.0):
     - Moya/Core
     - RxSwift (~> 5.0)
-  - RxBinding (0.4):
-    - RxCocoa (< 6.0.0, >= 5.0.0)
-    - RxSwift (< 6.0.0, >= 5.0.0)
   - RxCocoa (5.1.1):
     - RxRelay (~> 5)
     - RxSwift (~> 5)
@@ -26,7 +23,6 @@ PODS:
   - RxRelay (5.1.1):
     - RxSwift (~> 5)
   - RxSwift (5.1.1)
-  - SVProgressHUD (2.2.5)
   - Swinject (2.6.0)
   - SwinjectStoryboard (2.2.0):
     - Swinject (~> 2.6)
@@ -38,11 +34,9 @@ DEPENDENCIES:
   - Cartography (~> 3.0)
   - lottie-ios
   - Moya/RxSwift
-  - RxBinding
   - RxCocoa
   - RxDataSources
   - RxGesture
-  - SVProgressHUD
   - Swinject (= 2.6.0)
   - SwinjectStoryboard
   - SWXMLHash (~> 5.0.0)
@@ -56,13 +50,11 @@ SPEC REPOS:
     - Differentiator
     - lottie-ios
     - Moya
-    - RxBinding
     - RxCocoa
     - RxDataSources
     - RxGesture
     - RxRelay
     - RxSwift
-    - SVProgressHUD
     - Swinject
     - SwinjectStoryboard
     - SWXMLHash
@@ -75,18 +67,16 @@ SPEC CHECKSUMS:
   Differentiator: 886080237d9f87f322641dedbc5be257061b0602
   lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   Moya: 5b45dacb75adb009f97fde91c204c1e565d31916
-  RxBinding: da433c012633802a72c2a5bec8775b86f4cddeb8
   RxCocoa: 32065309a38d29b5b0db858819b5bf9ef038b601
   RxDataSources: efee07fa4de48477eca0a4611e6d11e2da9c1114
   RxGesture: d6bd7447ca3a596c7a9702a6a2b6a2bb5d8bae54
   RxRelay: d77f7d771495f43c556cbc43eebd1bb54d01e8e9
   RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
-  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   Swinject: 48a96cda93633cf2860697b4ce76ab5db9ebaca2
   SwinjectStoryboard: 32512ef16c2b0ff5b8f823b23539c4a50f6d3383
   SWXMLHash: 9cc0c2e4807926c74377724aa8722ee5707a0485
   Then: acfe0be7e98221c6204e12f8161459606d5d822d
 
-PODFILE CHECKSUM: 98c0ba7530a7818554b43f5d14b6517099a5fae0
+PODFILE CHECKSUM: db403b725de4eeae4e26a43caacd39ef2f861e87
 
 COCOAPODS: 1.9.3

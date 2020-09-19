@@ -77,9 +77,9 @@
 			isa = PBXGroup;
 			children = (
 				491904D925161CA60017A8DF /* SOAPTestModel.swift */,
-				491904D3251601F70017A8DF /* SOAPTestViewModel.swift */,
-				49D894CB2514D69800FE3083 /* SOAPTestViewController.swift */,
 				491904D725161C430017A8DF /* SOAPTestTableViewCell.swift */,
+				49D894CB2514D69800FE3083 /* SOAPTestViewController.swift */,
+				491904D3251601F70017A8DF /* SOAPTestViewModel.swift */,
 			);
 			path = MVVM;
 			sourceTree = "<group>";
@@ -116,15 +116,15 @@
 			isa = PBXGroup;
 			children = (
 				491904DB251622CB0017A8DF /* Animations */,
-				491904D5251604830017A8DF /* DI.swift */,
-				495EF1C22515639E004415C9 /* Network */,
 				495EF1BF25156306004415C9 /* MVVM */,
+				495EF1C22515639E004415C9 /* Network */,
+				49AEFB982514DA3E00837756 /* SOAPTestProject-Bridging-Header.h */,
+				49D894D52514D69A00FE3083 /* Info.plist */,
 				49D894C72514D69800FE3083 /* AppDelegate.swift */,
+				491904D5251604830017A8DF /* DI.swift */,
 				49AEFBA02515026C00837756 /* ThenExtensions.swift */,
 				49D894D02514D69A00FE3083 /* Assets.xcassets */,
 				49D894D22514D69A00FE3083 /* LaunchScreen.storyboard */,
-				49D894D52514D69A00FE3083 /* Info.plist */,
-				49AEFB982514DA3E00837756 /* SOAPTestProject-Bridging-Header.h */,
 			);
 			path = SOAPTestProject;
 			sourceTree = "<group>";
