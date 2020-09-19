@@ -27,15 +27,15 @@ final class SOAPTestViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let tableView = UITableView(frame: .zero, style: .grouped).then {
+    private let tableView = UITableView().then {
         $0.register(
             SOAPTestTableViewCell.self,
             forCellReuseIdentifier: String(describing: SOAPTestTableViewCell.self)
         )
         $0.tableHeaderView = UIView().with { $0.backgroundColor = .white }
         $0.tableFooterView = UIView().with { $0.backgroundColor = .white }
-        $0.sectionFooterHeight = 16
-        $0.sectionHeaderHeight = 16
+        $0.sectionFooterHeight = 0
+        $0.sectionHeaderHeight = 0
         $0.rowHeight = UITableView.automaticDimension
         $0.estimatedRowHeight = 56
         $0.clipsToBounds = true
@@ -64,6 +64,9 @@ final class SOAPTestViewController: UIViewController {
         }
         
         func setAnimationViewConstraints() {
+            guard let view = view else { return }
+            
+            animationView.removeFromSuperview()
             view.addSubview(animationView)
             
             constrain(view, animationView) { view, animationView in
@@ -76,30 +79,26 @@ final class SOAPTestViewController: UIViewController {
         func bind() {
             let output = viewModel.transform(with: .init())
             
-            output.loading
-                .drive(
-                    onNext: { [weak self] loading in
-                        if loading {
-                            setAnimationViewConstraints()
-                            
-                            UIView.animate(withDuration: 0.3) {
-                                self?.animationView.alpha = 1.0
-                                self?.tableView.alpha = 0.0
-                            }
-                            self?.animationView.play(fromProgress: 0, toProgress: 1, loopMode: .loop)
-                        } else {
-                            UIView.animate(
-                                withDuration: 0.3,
-                                animations: {
-                                    self?.animationView.alpha = 0.0
-                                    self?.tableView.alpha = 1.0
-                                },
-                                completion: { _ in self?.animationView.removeFromSuperview() }
-                            )
-                        }
+            output.loading.drive(onNext: { [weak self] loading in
+                if loading {
+                    setAnimationViewConstraints()
+                    
+                    UIView.animate(withDuration: 0.3) {
+                        self?.animationView.alpha = 1.0
+                        self?.tableView.alpha = 0.0
                     }
-                )
-                .disposed(by: disposeBag)
+                    self?.animationView.play(fromProgress: 0, toProgress: 1, loopMode: .loop)
+                } else {
+                    UIView.animate(
+                        withDuration: 0.3,
+                        animations: {
+                            self?.animationView.alpha = 0.0
+                            self?.tableView.alpha = 1.0
+                        },
+                        completion: { _ in self?.animationView.removeFromSuperview() }
+                    )
+                }
+            }).disposed(by: disposeBag)
             
             output.source.asObservable().bind(
                 to: tableView.rx.items(
