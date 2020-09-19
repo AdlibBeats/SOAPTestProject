@@ -168,7 +168,7 @@ extension SOAPTestViewController {
                 totalPriceLabel.text = "Total price: \(newValue?.totalPrice ?? " - ")"
                 durationTimeLabel.text = "Duration time: \(newValue?.durationTime ?? "-")"
                 departureAirportCodeLabel.text = "Departure airport code: \(newValue?.departureAirportCode ?? "-")"
-                arrivalAirportCodeLabel.text = "Departure airport code: \(newValue?.arrivalAirportCode ?? "-")"
+                arrivalAirportCodeLabel.text = "Arrival airport code: \(newValue?.arrivalAirportCode ?? "-")"
             }
         }
     }
