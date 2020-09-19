@@ -105,7 +105,7 @@ final class SOAPTestViewController: UIViewController {
                     cellIdentifier: String(describing: SOAPTestTableViewCell.self),
                     cellType: SOAPTestTableViewCell.self
                 ),
-                curriedArgument: { _, model, cell in cell.model = model }
+                curriedArgument: { $2.model = $1 }
             ).disposed(by: disposeBag)
         }
         
