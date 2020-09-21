@@ -10,8 +10,11 @@ import RxCocoa
 import RxSwift
 import SWXMLHash
 
-protocol SOAPTestServiceProtocol {
+protocol NetworkServiceProtocol {
     var token: String { get set }
+}
+
+protocol SOAPTestServiceProtocol: NetworkServiceProtocol {
     func fetchToken() -> Observable<String>
     func fetchOptimalFaresOffers(with outboundDate: Date?) -> Observable<[OptimalFaresOffer]>
 }
