@@ -10,17 +10,9 @@ import Foundation
 
 protocol SOAPTestServiceMessagesProtocol {
     func makeBody() -> String
-    func makeTile() -> String
 }
 
 extension SOAPTestService.Config.Messages: SOAPTestServiceMessagesProtocol {
-    func makeTile() -> String {
-        switch self {
-        case .startSession: return "StartSession"
-        case .getOptimalFares: return "GetOptimalFares"
-        }
-    }
-    
     func makeBody() -> String {
         switch self {
         case .startSession: return """
