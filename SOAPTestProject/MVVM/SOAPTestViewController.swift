@@ -49,10 +49,6 @@ final class SOAPTestViewController: UIViewController {
         
         title = "Optimal fares offers"
         view.backgroundColor = .white
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         
         func setConstraints() {
             guard let view = view else { return }
@@ -66,6 +62,12 @@ final class SOAPTestViewController: UIViewController {
                 tableView.bottom == view.bottom
             }
         }
+        
+        setConstraints()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         func setAnimationViewConstraints() {
             guard let view = view else { return }
@@ -116,7 +118,6 @@ final class SOAPTestViewController: UIViewController {
             ).disposed(by: disposeBag)
         }
         
-        setConstraints()
         bind()
     }
 }

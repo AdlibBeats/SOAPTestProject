@@ -32,15 +32,14 @@ extension SOAPTestViewModel: SOAPTestViewModelProtocol {
     }
     
     func transform(with input: Input) -> Output {
-        let service = testService
         let loadingRelay = BehaviorRelay<Bool>(value: true)
         
         return Output(
             loading: loadingRelay.asDriver().distinctUntilChanged(),
             source: testService.fetchToken()
-                .do(onNext: { [weak self] in self?.testService.token = $0 })
-                .flatMapLatest { _ in
-                    service.fetchOptimalFaresOffers(
+                .do(onNext: { [weak self] in self?.testService.setToken($0) })
+                .flatMapLatest { [testService] _ in
+                    testService.fetchOptimalFaresOffers(
                         with: DateFormatter().with {
                             $0.dateFormat = "dd.MM.yyyy"
                         }.date(from: "25.09.2020")
@@ -76,7 +75,7 @@ extension SOAPTestViewModel: SOAPTestViewModelProtocol {
                         }
                     }
                 }
-                .asDriver(onErrorJustReturn: [])
+                .asDriver(onErrorDriveWith: .empty())
                 .distinctUntilChanged()
                 .do(onNext: { loadingRelay.accept($0.isEmpty) })
         )

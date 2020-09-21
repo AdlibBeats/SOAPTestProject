@@ -10,8 +10,10 @@ import RxCocoa
 import RxSwift
 import SWXMLHash
 
-protocol NetworkServiceProtocol {
-    var token: String { get set }
+protocol NetworkServiceProtocol: class {
+    func setToken(_ token: String)
+    func fetchUrl(at string: String) -> Observable<URL>
+    func fetchURLRequest(with url: String, _ body: String) -> Observable<URLRequest>
 }
 
 protocol SOAPTestServiceProtocol: NetworkServiceProtocol {
@@ -20,7 +22,7 @@ protocol SOAPTestServiceProtocol: NetworkServiceProtocol {
 }
 
 final class SOAPTestService {
-    var token = ""
+    private var token = ""
     
     enum URLError: Error {
         case invalid
@@ -35,8 +37,14 @@ final class SOAPTestService {
             case getOptimalFares(token: String, outboundDate: String)
         }
     }
+}
+
+extension SOAPTestService: SOAPTestServiceProtocol {
+    func setToken(_ token: String) {
+        self.token = token
+    }
     
-    private func fetchUrl(at string: String) -> Observable<URL> {
+    func fetchUrl(at string: String) -> Observable<URL> {
         Observable.create {
             guard let url = URL(string: string) else {
                 $0.onError(URLError.invalid)
@@ -47,7 +55,7 @@ final class SOAPTestService {
         }
     }
     
-    private func fetchURLRequest(with url: String, _ body: String) -> Observable<URLRequest> {
+    func fetchURLRequest(with url: String, _ body: String) -> Observable<URLRequest> {
         fetchUrl(at: url).map {
             URLRequest(url: $0).with {
                 $0.httpMethod = "POST"
@@ -60,9 +68,7 @@ final class SOAPTestService {
             }
         }
     }
-}
-
-extension SOAPTestService: SOAPTestServiceProtocol {
+    
     func fetchToken() -> Observable<String> {
         fetchURLRequest(
             with: "\(Config.baseUrl.rawValue)\(Config.travelshop.rawValue)",
