@@ -38,13 +38,8 @@ extension SOAPTestViewModel: SOAPTestViewModelProtocol {
             loading: loadingRelay.asDriver().distinctUntilChanged(),
             source: testService.fetchToken()
                 .do(onNext: { [weak self] in self?.testService.setToken($0) })
-                .flatMapLatest { [testService] _ in
-                    testService.fetchOptimalFaresOffers(
-                        with: DateFormatter().with {
-                            $0.dateFormat = "dd.MM.yyyy"
-                        }.date(from: "25.09.2020")
-                    )
-                }
+                .map { _ in DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.date(from: "25.09.2020") }
+                .flatMapLatest(testService.fetchOptimalFaresOffers)
                 .map {
                     $0.filter { $0.ak == "S7" }.flatMap { offer in
                         (offer.directions ?? []).flatMap { $0.flights ?? [] }.flatMap { $0.segments ?? [] }.map {
