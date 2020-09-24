@@ -15,7 +15,7 @@ protocol NetworkServiceProtocol: class {
     func fetchUrl(at string: String) -> Observable<URL>
     func fetchURLRequest(with url: String, _ body: String) -> Observable<URLRequest>
     func fetchResponse(with request: URLRequest) -> Observable<(response: HTTPURLResponse, data: Data)>
-    func convertStringResponse(with data: Data) -> Observable<String>
+    func convertToStringResponse(from data: Data) -> Observable<String>
 }
 
 extension NetworkServiceProtocol {
@@ -48,7 +48,7 @@ extension NetworkServiceProtocol {
         URLSession.shared.rx.response(request: request)
     }
     
-    func convertStringResponse(with data: Data) -> Observable<String> {
+    func convertToStringResponse(from data: Data) -> Observable<String> {
         Observable.create {
             guard let result = String(
                 data: data,
@@ -94,7 +94,7 @@ extension SOAPTestService: SOAPTestServiceProtocol {
     func fetchToken() -> Observable<String> {
         fetchURLRequest(
             with: "\(Config.baseUrl.rawValue)\(Config.travelshop.rawValue)", Config.Messages.startSession.makeBody()
-        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(convertStringResponse).flatMapLatest { response in
+        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(convertToStringResponse).flatMapLatest { response in
             Observable.create {
                 do {
                     $0.onNext(try SWXMLHash.parse(response)
@@ -123,7 +123,7 @@ extension SOAPTestService: SOAPTestServiceProtocol {
                     return DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.string(from: date)
                 }(outboundDate)
             ).makeBody()
-        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(convertStringResponse).flatMapLatest { response in
+        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(convertToStringResponse).flatMapLatest { response in
             Observable.create {
                 do {
                     $0.onNext(try SWXMLHash.parse(response)
