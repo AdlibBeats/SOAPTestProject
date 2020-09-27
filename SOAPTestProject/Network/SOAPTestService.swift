@@ -10,16 +10,23 @@ import RxCocoa
 import RxSwift
 import SWXMLHash
 
+enum NetworkServiceHTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+}
+
 protocol NetworkServiceProtocol: class {
     func setToken(_ token: String)
-    func fetchUrl(at string: String) -> Observable<URL>
-    func fetchURLRequest(with url: String, _ body: String) -> Observable<URLRequest>
-    func fetchResponse(with request: URLRequest) -> Observable<(response: HTTPURLResponse, data: Data)>
-    func convertToStringResponse(from data: Data) -> Observable<String>
+    func fetchUrl(from string: String) -> Observable<URL>
+    func fetchURLRequest(from url: String, _ httpMethod: NetworkServiceHTTPMethod, _ body: String) -> Observable<URLRequest>
+    func fetchResponse(from request: URLRequest) -> Observable<(response: HTTPURLResponse, data: Data)>
+    func fetchStringResponse(from data: Data) -> Observable<String>
 }
 
 extension NetworkServiceProtocol {
-    func fetchUrl(at string: String) -> Observable<URL> {
+    func fetchUrl(from string: String) -> Observable<URL> {
         Observable.create {
             guard let url = URL(string: string) else {
                 $0.onError(RxCocoaURLError.unknown)
@@ -30,10 +37,10 @@ extension NetworkServiceProtocol {
         }
     }
     
-    func fetchURLRequest(with url: String, _ body: String) -> Observable<URLRequest> {
-        fetchUrl(at: url).map {
+    func fetchURLRequest(from url: String, _ httpMethod: NetworkServiceHTTPMethod, _ body: String) -> Observable<URLRequest> {
+        fetchUrl(from: url).map {
             URLRequest(url: $0).with {
-                $0.httpMethod = "POST"
+                $0.httpMethod = httpMethod.rawValue
                 $0.addValue("text/xml; charset=utf-8", forHTTPHeaderField: "Content-Type")
                 $0.addValue("\(body.count)", forHTTPHeaderField: "Content-Length")
                 $0.httpBody = body.data(
@@ -44,11 +51,11 @@ extension NetworkServiceProtocol {
         }
     }
     
-    func fetchResponse(with request: URLRequest) -> Observable<(response: HTTPURLResponse, data: Data)> {
+    func fetchResponse(from request: URLRequest) -> Observable<(response: HTTPURLResponse, data: Data)> {
         URLSession.shared.rx.response(request: request)
     }
     
-    func convertToStringResponse(from data: Data) -> Observable<String> {
+    func fetchStringResponse(from data: Data) -> Observable<String> {
         Observable.create {
             guard let result = String(
                 data: data,
@@ -63,14 +70,22 @@ extension NetworkServiceProtocol {
     }
 }
 
+class NetworkService {
+    fileprivate var token = ""
+}
+
+extension NetworkService: NetworkServiceProtocol {
+    func setToken(_ token: String) {
+        self.token = token
+    }
+}
+
 protocol SOAPTestServiceProtocol: NetworkServiceProtocol {
     func fetchToken() -> Observable<String>
     func fetchOptimalFaresOffers(with outboundDate: Date?) -> Observable<[OptimalFaresOffer]>
 }
 
-final class SOAPTestService {
-    private var token = ""
-    
+final class SOAPTestService: NetworkService {
     enum URLError: Error {
         case invalid
     }
@@ -87,14 +102,12 @@ final class SOAPTestService {
 }
 
 extension SOAPTestService: SOAPTestServiceProtocol {
-    func setToken(_ token: String) {
-        self.token = token
-    }
-    
     func fetchToken() -> Observable<String> {
         fetchURLRequest(
-            with: "\(Config.baseUrl.rawValue)\(Config.travelshop.rawValue)", Config.Messages.startSession.makeBody()
-        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(convertToStringResponse).flatMapLatest { response in
+            from: "\(Config.baseUrl.rawValue)\(Config.travelshop.rawValue)",
+            .post,
+            Config.Messages.startSession.makeBody()
+        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(fetchStringResponse).flatMapLatest { response in
             Observable.create {
                 do {
                     $0.onNext(try SWXMLHash.parse(response)
@@ -115,7 +128,8 @@ extension SOAPTestService: SOAPTestServiceProtocol {
     
     func fetchOptimalFaresOffers(with outboundDate: Date?) -> Observable<[OptimalFaresOffer]> {
         fetchURLRequest(
-            with: "\(Config.baseUrl.rawValue)\(Config.travelshop.rawValue)",
+            from: "\(Config.baseUrl.rawValue)\(Config.travelshop.rawValue)",
+            .post,
             Config.Messages.getOptimalFares(
                 token: token,
                 outboundDate: { (date: Date?) -> String in
@@ -123,7 +137,7 @@ extension SOAPTestService: SOAPTestServiceProtocol {
                     return DateFormatter().with { $0.dateFormat = "dd.MM.yyyy" }.string(from: date)
                 }(outboundDate)
             ).makeBody()
-        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(convertToStringResponse).flatMapLatest { response in
+        ).flatMapLatest(fetchResponse).map { $0.data }.flatMapLatest(fetchStringResponse).flatMapLatest { response in
             Observable.create {
                 do {
                     $0.onNext(try SWXMLHash.parse(response)
