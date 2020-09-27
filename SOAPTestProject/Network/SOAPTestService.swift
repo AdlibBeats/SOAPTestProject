@@ -10,17 +10,10 @@ import RxCocoa
 import RxSwift
 import SWXMLHash
 
-enum NetworkServiceHTTPMethod: String {
-    case get = "GET"
-    case post = "POST"
-    case put = "PUT"
-    case delete = "DELETE"
-}
-
 protocol NetworkServiceProtocol: class {
     func setToken(_ token: String)
     func fetchUrl(from string: String) -> Observable<URL>
-    func fetchURLRequest(from url: String, _ httpMethod: NetworkServiceHTTPMethod, _ body: String) -> Observable<URLRequest>
+    func fetchURLRequest(from url: String, _ httpMethod: NetworkService.HTTPMethod, _ body: String) -> Observable<URLRequest>
     func fetchResponse(from request: URLRequest) -> Observable<(response: HTTPURLResponse, data: Data)>
     func fetchStringResponse(from data: Data) -> Observable<String>
 }
@@ -37,7 +30,7 @@ extension NetworkServiceProtocol {
         }
     }
     
-    func fetchURLRequest(from url: String, _ httpMethod: NetworkServiceHTTPMethod, _ body: String) -> Observable<URLRequest> {
+    func fetchURLRequest(from url: String, _ httpMethod: NetworkService.HTTPMethod, _ body: String) -> Observable<URLRequest> {
         fetchUrl(from: url).map {
             URLRequest(url: $0).with {
                 $0.httpMethod = httpMethod.rawValue
@@ -72,6 +65,13 @@ extension NetworkServiceProtocol {
 
 class NetworkService {
     fileprivate var token = ""
+    
+    enum HTTPMethod: String {
+        case get = "GET"
+        case post = "POST"
+        case put = "PUT"
+        case delete = "DELETE"
+    }
 }
 
 extension NetworkService: NetworkServiceProtocol {
